@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "CRXJS React Vite Example",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "src/content.tsx"
+      ],
+      "matches": [
+        "https://www.google.com/"
+      ]
+    },
+    {
+      "js": [
+        "src/summary.tsx"
+      ],
+      "matches": [
+        "https://www.linkedin.com/jobs/collections/*"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}

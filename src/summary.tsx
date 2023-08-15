@@ -28,7 +28,7 @@ window.addEventListener("load", function load(event) {
   });
 
   console.log(yearsOfExperience);
-}, {once: true});
+}, { once: true });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //this might create be a race condition with onMessage vs page load 
   console.log(message, " from chrome runtime")
@@ -36,7 +36,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //this
   const regex = /(\d+)(?:\s*-\s*(\d+))?\s*\+?\s*years?/g;
   //@ts-ignore For linkedIn, it will always be there
   const text = document.querySelector(".jobs-description-content__text").innerText
-  console.log(text)
+  const summaryContainer = document.querySelector(".summary-container")
+
+  if (summaryContainer) {
+    summaryContainer.remove()
+  }
+
+  // console.log(text)
   const matches = [...text.matchAll(regex)];
   const yearsOfExperience = matches.map(match => {
     const rangeMin = match[1];
@@ -50,4 +56,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //this
   });
   console.log(yearsOfExperience);
   sendResponse(`yuh ${text === "About the job"}`)
+  const jobTitle = document.querySelector(".jobs-unified-top-card__job-title")
+  // console.log(jobTitle)
+
+  if (yearsOfExperience.length !== 0) {
+    jobTitle?.insertAdjacentHTML("afterend", `<div class="summary-container"><div style="color: red;">Minimum of ${yearsOfExperience} years of experience</div></div>`)
+  }else {
+    jobTitle?.insertAdjacentHTML("afterend", `<div class="summary-container"><div style="color: red;">Couldn't retrieve minimum years of experience</div></div>`)
+  }
 })
+

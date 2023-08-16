@@ -4,6 +4,8 @@
 
 // once content script is loaded, it wont add the event listener again for some reason
 
+import ReactDOM from "react-dom/client";
+import "./summary.css";
 console.log("content script loaded", document.readyState);
 
 window.addEventListener("load", function load(event) {
@@ -56,13 +58,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { //this
   });
   console.log(yearsOfExperience);
   sendResponse(`yuh ${text === "About the job"}`)
-  const jobTitle = document.querySelector(".jobs-unified-top-card__job-title")
-  // console.log(jobTitle)
+  const jobTitleElm = document.querySelector(".display-flex.justify-space-between.flex-wrap")
+  // console.log(jobTitleElm)
 
-  if (yearsOfExperience.length !== 0) {
-    jobTitle?.insertAdjacentHTML("afterend", `<div class="summary-container"><div style="color: red;">Minimum of ${yearsOfExperience} years of experience</div></div>`)
-  }else {
-    jobTitle?.insertAdjacentHTML("afterend", `<div class="summary-container"><div style="color: red;">Couldn't retrieve minimum years of experience</div></div>`)
-  }
+  // jobTitleElm?.insertAdjacentHTML("afterend","<div class='summary-container'></div>")
+  createSummaryContainer(jobTitleElm, yearsOfExperience)
 })
 
+const createSummaryContainer = (jobTitleElm: Element | null, yearsOfExperience) => {
+  const getYoe = () => {
+    if (yearsOfExperience.length !== 0) {
+      return <div className="badge">Minimum of {yearsOfExperience[0]} years of experience</div>
+    } else {
+      return <div className="badge">Couldn't retrieve minimum years of experience</div>
+    }
+  }
+  const root = document.createElement("div");
+  root.className = "summary-container";
+
+  jobTitleElm?.insertAdjacentElement("afterend", root)
+
+  ReactDOM.createRoot(root).render(
+    getYoe()
+  )
+}
